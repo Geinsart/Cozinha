@@ -12,7 +12,11 @@ export function makeBoxInstance(
 }
 
 export function makeBoxInstanceV2(args) {
+<<<<<<< HEAD
   const { color, position, rotation, size, side = THREE.FrontSide, } = args;
+=======
+  const { color, position, rotation, size, side = THREE.FrontSide } = args;
+>>>>>>> 11d1c5e39e1dfe44f24d6dd29dad7f786cb2c75f
   const material = new THREE.MeshLambertMaterial({ color: color, side: side });
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const cube = new THREE.Mesh(boxGeometry, material);
@@ -23,7 +27,10 @@ export function makeBoxInstanceV2(args) {
 
   cube.scale.set(size.x, size.y, size.z);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 11d1c5e39e1dfe44f24d6dd29dad7f786cb2c75f
   function setColor(newColor) {
     material.color.set(newColor);
   }

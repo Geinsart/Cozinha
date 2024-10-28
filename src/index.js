@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"; // movimentar a tela
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { makeBoxInstance, makeBoxInstanceV2 } from "./makeInstance";
 
 const fov = 75;
@@ -30,21 +30,25 @@ document.body.appendChild(renderer.domElement);
 const planeGeometry = new THREE.PlaneGeometry(5, 5);
 
 const sceneObjects = [
-  makeBoxInstance(
+  makeBoxInstanceV2(
     //geladeira
-    0x0000ff,
-    { x: -1, y: 1, z: -2 },
-    { x: 0, y: 0, z: 0 },
-    { x: 1, y: 2, z: 1 }
+    {
+      color: 0x0000ff,
+      position: { x: -1, y: 1, z: -2 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 1, y: 2, z: 1 },
+    }
   ),
 
-  makeBoxInstance(
+  makeBoxInstanceV2(
     // cubo invertido
-    0xffa500,
-    { x: 0.9, y: 1.75, z: -0.05 },
-    { x: 0, y: 0, z: 0 },
-    { x: 5, y: 3.5, z: 5 },
-    THREE.BackSide
+    {
+      color: 0xffa500,
+      position: { x: 0.9, y: 1.75, z: -0.05 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 5, y: 3.5, z: 5 },
+      side: THREE.BackSide
+    }
   ),
 
   makeBoxInstanceV2(
@@ -56,50 +60,70 @@ const sceneObjects = [
       size: { x: 2.6, y: 1, z: 1 },
     }
   ),
+
+  makeBoxInstanceV2(
+    //armario
+    {
+      color: 0x800080,
+      position: { x: -1, y: 0.8, z: 1.4 },
+      rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 },
+      size: { x: 2, y: 1.5, z: 1 },
+    }
+  ),
+  makeBoxInstanceV2(
+    //cooktop
+    {
+      color: 0x00ff00,
+      position: { x: 0, y: 0.5, z: -2 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 1, y: 1, z: 1 },
+    }
+  )
 ];
-
-const cubeCooktop = makeBoxInstanceV2(
-  {
-    color: 0x00ff00,
-    position: { x: 0, y: 0.5, z: -2 },
-    rotation: { x: 0, y: 0, z: 0 },
-    size: { x: 1, y: 1, z: 1 },
-  },
-);
-
-sceneObjects.push(cubeCooktop);
 
 sceneObjects.forEach((obj) => scene.add(obj.cube));
 
-class PickHelper {
-  constructor() {
-    this.raycaster = new THREE.Raycaster();
-    this.pickedObject = null;
-    this.pickedObjectSavedColor = 0;
-  }
-  pick(normalizedPosition, scene, camera, time) {
-    // restore the color if there is a picked object
-    if (this.pickedObject) {
-      this.pickedObject.material.emissive.setHex(this.pickedObjectSavedColor);
-      this.pickedObject = undefined;
+
+
+const names = [
+  { name: "freezer", object: sceneObjects[0] },
+  { name: "walls", object: sceneObjects[1] },
+  { name: "sink", object: sceneObjects[2] },
+  { name: "chinaCabinet", object: sceneObjects[3] },
+  { name: "cooktop", object: sceneObjects[4] },
+];
+
+
+
+
+function PickHelper() {
+  const raycaster = new THREE.Raycaster();
+  let pickedObject = null;
+
+  this.pick = (normalizedPosition, scene, camera) => {
+    raycaster.setFromCamera(normalizedPosition, camera);
+    const intersectedObjects = raycaster.intersectObjects(scene.children, true);
+
+
+    if (intersectedObjects.length > 0) {
+      pickedObject = intersectedObjects[0].object;
     }
-    this.raycaster.setFromCamera(normalizedPosition, camera);
-    // get the list of objects the ray intersected
-    const intersectedObjects = this.raycaster.intersectObjects(scene.children);
-    if (intersectedObjects.length) {
-      // pick the first object. It's the closest one
-      this.pickedObject = intersectedObjects[0].object;
-      // save its color
-      this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
-      // set its emissive color to flashing red/yellow
-      this.pickedObject.material.emissive.setHex((time * 8) % 2 > 1 ? 0xff0000 : 0xffa500);
+
+    const found = names.find((item) => item.object.cube === pickedObject);
+
+    if (found) {
+      console.log("Objeto selecionado", found.name);
+    } else {
+      console.log("Objeto selecionado não tem um nome associado.");
     }
-  }
+  };
 }
 
-const pickPosition = { x: 0, y: 0 };
-clearPickPosition();
+const pickHelper = new PickHelper()
 
+const pickPosition = { x: 0, y: 0 };
+
+clearPickPosition();
 
 function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
@@ -109,70 +133,30 @@ function getCanvasRelativePosition(event) {
   };
 }
 
+
+
 function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
   pickPosition.x = (pos.x / canvas.width) * 2 - 1;
-  pickPosition.y = (pos.y / canvas.height) * -2 + 1;  // note we flip Y
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;
 }
 
 function clearPickPosition() {
-  // unlike the mouse which always has a position
-  // if the user stops touching the screen we want
-  // to stop picking. For now we just pick a value
-  // unlikely to pick something
   pickPosition.x = -100000;
   pickPosition.y = -100000;
 }
 
-window.addEventListener('mousemove', setPickPosition);
-window.addEventListener('mouseout', clearPickPosition);
-window.addEventListener('mouseleave', clearPickPosition);
-
-window.addEventListener('touchstart', (event) => {
-  // prevent the window from scrolling
-  event.preventDefault();
-  setPickPosition(event.touches[0]);
-}, { passive: false });
-
-window.addEventListener('touchmove', (event) => {
-  setPickPosition(event.touches[0]);
-});
-
-window.addEventListener('touchend', clearPickPosition);
-
-const pickHelper = new PickHelper();
+window.addEventListener("click", setPickPosition);
+canvas.addEventListener("mouseout", clearPickPosition);
 
 
 function render() {
-  try {
-    checkResizeRendererToDisplaySize(renderer);
-
-    console.log("Pick Position:", pickPosition);
-    console.log("Scene:", scene);
-    console.log("Camera:", camera);
-    console.log("Time:", time);
-
-    pickHelper.pick(pickPosition, scene, camera, time);
-
-    renderer.render(scene, camera);
-    requestAnimationFrame(render);
-    controls.update();
-  } catch (error) {
-    console.error("Erro durante a renderização:", error);
-  }
+  checkResizeRendererToDisplaySize(renderer);
+  pickHelper.pick(pickPosition, scene, camera)
+  renderer.render(scene, camera);
+  requestAnimationFrame(render);
+  controls.update();
 }
-
-document.getElementById("colorButton").addEventListener("click", function () {
-  const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffa500, 0x800080, 0xffff00];
-  let currentColor = cubeCooktop.cube.material.color.getHex();
-  let newColor;
-
-  do {
-    newColor = colors[Math.floor(Math.random() * colors.length)];
-  } while (newColor === currentColor);
-
-  cubeCooktop.setColor(newColor);
-});
 
 
 function checkResizeRendererToDisplaySize(renderer) {
@@ -189,7 +173,7 @@ function checkResizeRendererToDisplaySize(renderer) {
   return needResize;
 }
 
-
+// Inicia a animação
 requestAnimationFrame(render);
 
 // Adiciona um listener para redimensionamento

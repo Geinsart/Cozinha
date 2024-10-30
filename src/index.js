@@ -30,8 +30,12 @@ document.body.appendChild(renderer.domElement);
 
 const planeGeometry = new THREE.PlaneGeometry(5, 5);
 
+/**
+ * TODO #1: SceneObjects must be an array of objects with instance and name.
+ * For instance, `const names = [{ name, object }]` already looks right, you just need to
+ * change from object: sceneObjects to a makeInstance function.
+ */
 const sceneObjects = [
-
   makeBoxInstanceV2(
     //geladeira
     {
@@ -49,9 +53,8 @@ const sceneObjects = [
       position: { x: 0.9, y: 1.75, z: -0.05 },
       rotation: { x: 0, y: 0, z: 0 },
       size: { x: 5, y: 3.5, z: 5 },
-      side: THREE.BackSide
+      side: THREE.BackSide,
     }
-
   ),
 
   makeBoxInstanceV2(
@@ -64,13 +67,12 @@ const sceneObjects = [
     }
   ),
 
-
   makeBoxInstanceV2(
     //armario
     {
       color: 0x800080,
       position: { x: -1, y: 0.8, z: 1.4 },
-      rotation: { x: 0, y: 90 * Math.PI / 180, z: 0 },
+      rotation: { x: 0, y: (90 * Math.PI) / 180, z: 0 },
       size: { x: 2, y: 1.5, z: 1 },
     }
   ),
@@ -82,12 +84,8 @@ const sceneObjects = [
       rotation: { x: 0, y: 0, z: 0 },
       size: { x: 1, y: 1, z: 1 },
     }
-  )
+  ),
 ];
-
-sceneObjects.forEach((obj) => scene.add(obj.cube));
-
-
 
 const names = [
   { name: "freezer", object: sceneObjects[0] },
@@ -97,8 +95,8 @@ const names = [
   { name: "cooktop", object: sceneObjects[4] },
 ];
 
-
-
+/** After TODO #1 you need to make sure scene.add is using the right property path */
+sceneObjects.forEach((obj) => scene.add(obj.cube));
 
 function PickHelper() {
   const raycaster = new THREE.Raycaster();
@@ -107,8 +105,21 @@ function PickHelper() {
   this.pick = (normalizedPosition, scene, camera) => {
     raycaster.setFromCamera(normalizedPosition, camera);
     const intersectedObjects = raycaster.intersectObjects(scene.children, true);
+    /** TODO #2 [SPIKE/STUDY]
+     * Confirm if raycaster.intersectedObjects returns objects in a ordered way.
+     * Basically, if the first object returned is the closest and the last object (array item) is the
+     * non-picked or maybe the last in hierarchy.
+     */
 
-
+    /**
+     * TODO #3
+     * Instead of picking the first object,
+     * loop through the list of possible picked objects, and
+     * show their names.
+     * Additional: Try to show their positions on the scene.
+     * Tips:
+     *  - Use Array.prototype.map(lambda)
+     */
     if (intersectedObjects.length > 0) {
       pickedObject = intersectedObjects[0].object;
     }
@@ -120,10 +131,21 @@ function PickHelper() {
     } else {
       console.log("Objeto selecionado não tem um nome associado.");
     }
+
+    /**
+     * TODO #5
+     * Shows object names in view, not using console.log.
+     * Tips:
+     *  - Use a simple <p> tag to show the text.
+     *  - HTMLElement.prototype.innerText
+     *  - Identify <p> tag with #id pick-objects-names
+     *  - document.querySelector('#pick-objects-names')
+     *  - Use Array.prototype.join(lambda) to convert a array into a string
+     */
   };
 }
 
-const pickHelper = new PickHelper()
+const pickHelper = new PickHelper();
 
 const pickPosition = { x: 0, y: 0 };
 
@@ -132,12 +154,10 @@ clearPickPosition();
 function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
   return {
-    x: (event.clientX - rect.left) * canvas.width / rect.width,
-    y: (event.clientY - rect.top) * canvas.height / rect.height,
+    x: ((event.clientX - rect.left) * canvas.width) / rect.width,
+    y: ((event.clientY - rect.top) * canvas.height) / rect.height,
   };
 }
-
-
 
 function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
@@ -150,19 +170,33 @@ function clearPickPosition() {
   pickPosition.y = -100000;
 }
 
+/**
+ * TODO #4
+ * Show an Toggle Button at UI that should define if you want to see
+ * objects based on their click or by hovering them.
+ * If Toggle is Active, use HOVER.
+ * If Toggle is not Active, use CLICK.
+ * Every time the Toggle changes, you should exchange event listeners.
+ * Tips:
+ *  - window.removeEventListener
+ *  - create a toggle using a simple button in HTML
+ *  - add event listener to the button which executes the toggle of events
+ *
+ * This should happen so the user can choose if it wants to see
+ * objects names based on clicks or hovers.
+ */
 window.addEventListener("click", setPickPosition);
-canvas.addEventListener("mouseout", clearPickPosition);
 
+canvas.addEventListener("mouseout", clearPickPosition);
 
 function render() {
   checkResizeRendererToDisplaySize(renderer);
-  pickHelper.pick(pickPosition, scene, camera)
+  pickHelper.pick(pickPosition, scene, camera);
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);
   controls.update();
 }
-
 
 function checkResizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;

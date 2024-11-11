@@ -1,41 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--serve para aparelhos mobile-->
     <title>Meu Projeto com Three.js</title>
     <style>
-        body { margin: 0; height: 100%; overflow: hidden; } /* Evita rolagem, garantindo que o canvas ocupe toda a tela */
-        #c {width: 100vw; height: 100vh; display: block; }
+        body {
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Evita rolagem, garantindo que o canvas ocupe toda a tela */
+        #c {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
         button {
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: none;
-    
-}
-        #colorButton {
-    margin: 0;      
-    padding: 10px 20px;
-    font-size: 16px;
-    color: white;
-    background-color: blue; /* Cor inicial */
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Transição suave */
-     outline: none;
-}
+            margin: 0;
+            padding: 0;
+            border: none;
+            background: none;
 
-#colorButton:hover {
-    background-color: darkblue; /* Cor ao passar o mouse */
-}
+        }
 
-        </style>
+        .toggle-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            /* Cor inicial (ativado) */
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .off {
+            background-color: #f44336;
+            /* Cor para o estado desativado */
+        }
+    </style>
 </head>
+
 <body>
-    <button id="colorButton">Clique para mudar de cor</button>
+    <p id="pick-objects-names">Nenhum Objeto selecionado.</p>
+    <button id="toggleButton" class="toggle-btn">Start</button>
     <canvas id="c"></canvas>
     <script src="./src/index.js " type="module"></script>
 </body>
+
 </html>

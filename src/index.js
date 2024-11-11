@@ -1,6 +1,6 @@
 import * as THREE from "three";
-
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
 import { makeBoxInstance, makeBoxInstanceV2 } from "./makeInstance";
 
 const fov = 75;
@@ -8,7 +8,7 @@ const aspect = 2; // the canvas default
 const near = 0.1;
 const far = 10;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.z = 5;
+camera.position.set(1, 1, 2);
 
 const size = 5;
 const divisions = 10;
@@ -18,6 +18,7 @@ const color = 0xffffff;
 const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
 
+
 const scene = new THREE.Scene();
 scene.add(gridHelper);
 scene.add(axesHelper);
@@ -26,6 +27,7 @@ scene.add(light);
 const canvas = document.querySelector("#c");
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 const controls = new OrbitControls(camera, renderer.domElement);
+
 document.body.appendChild(renderer.domElement);
 
 const planeGeometry = new THREE.PlaneGeometry(5, 5);
@@ -36,75 +38,80 @@ const planeGeometry = new THREE.PlaneGeometry(5, 5);
  * change from object: sceneObjects to a makeInstance function.
  */
 const sceneObjects = [
-  makeBoxInstanceV2(
-    //geladeira
-    {
-      color: 0x0000ff,
-      position: { x: -1, y: 1, z: -2 },
-      rotation: { x: 0, y: 0, z: 0 },
-      size: { x: 1, y: 2, z: 1 },
-    }
-  ),
+  {
+    name: "freezer",
+    object: makeBoxInstanceV2(
 
-  makeBoxInstanceV2(
-    // cubo invertido
-    {
-      color: 0xffa500,
-      position: { x: 0.9, y: 1.75, z: -0.05 },
-      rotation: { x: 0, y: 0, z: 0 },
-      size: { x: 5, y: 3.5, z: 5 },
-      side: THREE.BackSide,
-    }
-  ),
+      {
+        color: 0x0000ff,
+        position: { x: -1, y: 1, z: -2 },
+        rotation: { x: 0, y: 0, z: 0 },
+        size: { x: 1, y: 2, z: 1 },
+      }
+    )
+  },
 
-  makeBoxInstanceV2(
-    //pia
-    {
-      color: 0x800080,
-      position: { x: 1.9, y: 0.5, z: -2 },
-      rotation: { x: 0, y: 0, z: 0 },
-      size: { x: 2.6, y: 1, z: 1 },
-    }
-  ),
+  {
+    name: "walls",
+    object: makeBoxInstanceV2(
+      {
+        color: 0xffa500,
+        position: { x: 0.9, y: 1.75, z: -0.05 },
+        rotation: { x: 0, y: 0, z: 0 },
+        size: { x: 5, y: 3.5, z: 5 },
+        side: THREE.BackSide,
+      }
+    )
+  },
 
-  makeBoxInstanceV2(
-    //armario
-    {
-      color: 0x800080,
-      position: { x: -1, y: 0.8, z: 1.4 },
-      rotation: { x: 0, y: (90 * Math.PI) / 180, z: 0 },
-      size: { x: 2, y: 1.5, z: 1 },
-    }
-  ),
-  makeBoxInstanceV2(
-    //cooktop
-    {
-      color: 0x00ff00,
-      position: { x: 0, y: 0.5, z: -2 },
-      rotation: { x: 0, y: 0, z: 0 },
-      size: { x: 1, y: 1, z: 1 },
-    }
-  ),
-];
+  {
+    name: "sink",
+    object: makeBoxInstanceV2(
+      {
+        color: 0x800080,
+        position: { x: 1.9, y: 0.5, z: -2 },
+        rotation: { x: 0, y: 0, z: 0 },
+        size: { x: 2.6, y: 1, z: 1 },
+      }
+    )
+  },
 
-const names = [
-  { name: "freezer", object: sceneObjects[0] },
-  { name: "walls", object: sceneObjects[1] },
-  { name: "sink", object: sceneObjects[2] },
-  { name: "chinaCabinet", object: sceneObjects[3] },
-  { name: "cooktop", object: sceneObjects[4] },
+  {
+    name: "chinaCabinet",
+    object: makeBoxInstanceV2(
+      {
+        color: 0x800080,
+        position: { x: -1, y: 0.8, z: 1.4 },
+        rotation: { x: 0, y: (90 * Math.PI) / 180, z: 0 },
+        size: { x: 2, y: 1.5, z: 1 },
+      }
+    )
+  },
+  {
+    name: "cooktop",
+    object: makeBoxInstanceV2(
+      {
+        color: 0x00ff00,
+        position: { x: 0, y: 0.5, z: -2 },
+        rotation: { x: 0, y: 0, z: 0 },
+        size: { x: 1, y: 1, z: 1 },
+      }
+    )
+  },
 ];
 
 /** After TODO #1 you need to make sure scene.add is using the right property path */
-sceneObjects.forEach((obj) => scene.add(obj.cube));
+sceneObjects.forEach((obj) => scene.add(obj.object.cube));
 
 function PickHelper() {
   const raycaster = new THREE.Raycaster();
-  let pickedObject = null;
+  let pickedObjects = [];
+  const namesELement = document.querySelector('#pick-objects-names');
 
   this.pick = (normalizedPosition, scene, camera) => {
     raycaster.setFromCamera(normalizedPosition, camera);
     const intersectedObjects = raycaster.intersectObjects(scene.children, true);
+
     /** TODO #2 [SPIKE/STUDY]
      * Confirm if raycaster.intersectedObjects returns objects in a ordered way.
      * Basically, if the first object returned is the closest and the last object (array item) is the
@@ -120,30 +127,31 @@ function PickHelper() {
      * Tips:
      *  - Use Array.prototype.map(lambda)
      */
-    if (intersectedObjects.length > 0) {
-      pickedObject = intersectedObjects[0].object;
-    }
+    this.pickedObjects = intersectedObjects.map(intersect => intersect.object);
 
-    const found = names.find((item) => item.object.cube === pickedObject);
+    const found = sceneObjects.filter((item) =>
+      pickedObjects.includes(item.object.cube));
 
-    if (found) {
-      console.log("Objeto selecionado", found.name);
+    if (found.length > 0) {
+      const names = found.map(obj => obj.name || "Objeto sem nome").join(", ");
+      namesELement.innerText = `Objetos possíveis selecionados: ${names}`;
     } else {
-      console.log("Objeto selecionado não tem um nome associado.");
-    }
-
-    /**
-     * TODO #5
-     * Shows object names in view, not using console.log.
-     * Tips:
-     *  - Use a simple <p> tag to show the text.
-     *  - HTMLElement.prototype.innerText
-     *  - Identify <p> tag with #id pick-objects-names
-     *  - document.querySelector('#pick-objects-names')
-     *  - Use Array.prototype.join(lambda) to convert a array into a string
-     */
+      namesELement.innerText = "nenhum Objeto selecionado.";
+    };
   };
-}
+
+  /**
+   * TODO #5
+   * Shows object names in view, not using console.log.
+   * Tips:
+   *  - Use a simple <p> tag to show the text.
+   *  - HTMLElement.prototype.innerText
+   *  - Identify <p> tag with #id pick-objects-names
+   *  - document.querySelector('#pick-objects-names')
+   *  - Use Array.prototype.join(lambda) to convert a array into a string
+   */
+};
+
 
 const pickHelper = new PickHelper();
 
@@ -185,9 +193,42 @@ function clearPickPosition() {
  * This should happen so the user can choose if it wants to see
  * objects names based on clicks or hovers.
  */
-window.addEventListener("click", setPickPosition);
 
-canvas.addEventListener("mouseout", clearPickPosition);
+const toggleButton = document.getElementById("toggleButton");
+
+let isClickEvent = true;
+
+
+toggleButton.addEventListener("click", () => {
+  toggleButton.classList.toggle("off");
+
+  if (toggleButton.classList.contains("off")) {
+    isClickEvent = !isClickEvent;
+    toggleButton.textContent = "Hover";
+  } else {
+    toggleButton.textContent = "Click";
+  };
+  toggleEvent();
+});
+
+
+const toggleEvent = () => {
+  canvas.removeEventListener("dblclick", setPickPosition);
+  canvas.removeEventListener("mouseenter", setPickPosition);
+  canvas.removeEventListener("mouseleave", clearPickPosition);
+
+
+  if (isClickEvent) {
+    canvas.addEventListener("dblclick", setPickPosition);
+    console.log("Modo Click ativado");
+  } else {
+    canvas.addEventListener("mouseenter", setPickPosition);
+    canvas.addEventListener("mouseleave", clearPickPosition);
+    console.log("Modo Hover ativado");
+  }
+};
+
+toggleEvent();
 
 function render() {
   checkResizeRendererToDisplaySize(renderer);

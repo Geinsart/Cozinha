@@ -3,6 +3,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import { makeBoxInstance, makeBoxInstanceV2 } from "./makeInstance";
 
+/**
+ * #TODO 01
+ * Split index.js into many files by domain:
+ *  - core_scene_control (pespectivecamera, gridhelpers, ambientlight, etc)
+ *  - scene_objects
+ *  - ui_display (dbclick or hover event)
+ *  - scene_events
+ *  - scene_helpers
+ * Next step (for next sessions): TypeScript
+ */
+
 const fov = 75;
 const aspect = 2; // the canvas default
 const near = 0.1;
@@ -18,7 +29,6 @@ const color = 0xffffff;
 const intensity = 1;
 const light = new THREE.AmbientLight(color, intensity);
 
-
 const scene = new THREE.Scene();
 scene.add(gridHelper);
 scene.add(axesHelper);
@@ -31,127 +41,112 @@ const controls = new OrbitControls(camera, renderer.domElement);
 document.body.appendChild(renderer.domElement);
 
 const planeGeometry = new THREE.PlaneGeometry(5, 5);
+planeGeometry.name = "background";
 
-/**
- * TODO #1: SceneObjects must be an array of objects with instance and name.
- * For instance, `const names = [{ name, object }]` already looks right, you just need to
- * change from object: sceneObjects to a makeInstance function.
- */
 const sceneObjects = [
   {
     name: "freezer",
-    object: makeBoxInstanceV2(
-
-      {
-        color: 0x0000ff,
-        position: { x: -1, y: 1, z: -2 },
-        rotation: { x: 0, y: 0, z: 0 },
-        size: { x: 1, y: 2, z: 1 },
-      }
-    )
+    object: makeBoxInstanceV2({
+      name: "freezer",
+      color: 0x0000ff,
+      position: { x: -1, y: 1, z: -2 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 1, y: 2, z: 1 },
+    }),
   },
 
   {
     name: "walls",
-    object: makeBoxInstanceV2(
-      {
-        color: 0xffa500,
-        position: { x: 0.9, y: 1.75, z: -0.05 },
-        rotation: { x: 0, y: 0, z: 0 },
-        size: { x: 5, y: 3.5, z: 5 },
-        side: THREE.BackSide,
-      }
-    )
+    object: makeBoxInstanceV2({
+      name: "walls",
+      color: 0xffa500,
+      position: { x: 0.9, y: 1.75, z: -0.05 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 5, y: 3.5, z: 5 },
+      side: THREE.BackSide,
+    }),
   },
 
   {
     name: "sink",
-    object: makeBoxInstanceV2(
-      {
-        color: 0x800080,
-        position: { x: 1.9, y: 0.5, z: -2 },
-        rotation: { x: 0, y: 0, z: 0 },
-        size: { x: 2.6, y: 1, z: 1 },
-      }
-    )
+    object: makeBoxInstanceV2({
+      name: "sink",
+      color: 0x800080,
+      position: { x: 1.9, y: 0.5, z: -2 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 2.6, y: 1, z: 1 },
+    }),
   },
 
   {
     name: "chinaCabinet",
-    object: makeBoxInstanceV2(
-      {
-        color: 0x800080,
-        position: { x: -1, y: 0.8, z: 1.4 },
-        rotation: { x: 0, y: (90 * Math.PI) / 180, z: 0 },
-        size: { x: 2, y: 1.5, z: 1 },
-      }
-    )
+    object: makeBoxInstanceV2({
+      name: "chinaCabinet",
+      color: 0x800080,
+      position: { x: -1, y: 0.8, z: 1.4 },
+      rotation: { x: 0, y: (90 * Math.PI) / 180, z: 0 },
+      size: { x: 2, y: 1.5, z: 1 },
+    }),
   },
   {
     name: "cooktop",
-    object: makeBoxInstanceV2(
-      {
-        color: 0x00ff00,
-        position: { x: 0, y: 0.5, z: -2 },
-        rotation: { x: 0, y: 0, z: 0 },
-        size: { x: 1, y: 1, z: 1 },
-      }
-    )
+    object: makeBoxInstanceV2({
+      name: "cooktop",
+      color: 0x00ff00,
+      position: { x: 0, y: 0.5, z: -2 },
+      rotation: { x: 0, y: 0, z: 0 },
+      size: { x: 1, y: 1, z: 1 },
+    }),
   },
 ];
 
-/** After TODO #1 you need to make sure scene.add is using the right property path */
 sceneObjects.forEach((obj) => scene.add(obj.object.cube));
+
+/**
+ * TODO #2
+ * Shows object names in view, not using console.log.
+ * Should show each name in its own element instead of using a single <p></p>
+ * Tips:
+ *  - document.createElement
+ *  - Use a simple <p> tag to show the text. (future usage: when clicking element name should hihglight element is scene)
+ *  - HTMLElement.prototype.innerText
+ *  - Identify <p> tag with #id pick-objects-names
+ *  - document.querySelector('#pick-objects-names')
+ *  - Use Array.prototype.join(lambda) to convert a array into a string
+ */
+function displayObjectNames(pickedItems) {
+  const namesELement = document.querySelector("#pick-objects-names");
+
+  if (pickedItems.length > 0) {
+    const names = pickedItems
+      .map((item) => {
+        const name = item.object.name || "Objeto sem nome";
+        const distance = item.distance;
+        return `${name} (${distance})`;
+      })
+      .join("\n");
+    namesELement.innerText = `Objetos possíveis selecionados:\n${names}`;
+  } else {
+    namesELement.innerText = "nenhum Objeto selecionado.";
+  }
+}
 
 function PickHelper() {
   const raycaster = new THREE.Raycaster();
   let pickedObjects = [];
-  const namesELement = document.querySelector('#pick-objects-names');
 
   this.pick = (normalizedPosition, scene, camera) => {
     raycaster.setFromCamera(normalizedPosition, camera);
-    const intersectedObjects = raycaster.intersectObjects(scene.children, true);
+    const intersectedItems = raycaster.intersectObjects(scene.children, true);
 
-    /** TODO #2 [SPIKE/STUDY]
-     * Confirm if raycaster.intersectedObjects returns objects in a ordered way.
-     * Basically, if the first object returned is the closest and the last object (array item) is the
-     * non-picked or maybe the last in hierarchy.
-     */
-
-    /**
-     * TODO #3
-     * Instead of picking the first object,
-     * loop through the list of possible picked objects, and
-     * show their names.
-     * Additional: Try to show their positions on the scene.
-     * Tips:
-     *  - Use Array.prototype.map(lambda)
-     */
-    this.pickedObjects = intersectedObjects.map(intersect => intersect.object);
-
-    const found = sceneObjects.filter((item) =>
-      pickedObjects.includes(item.object.cube));
-
-    if (found.length > 0) {
-      const names = found.map(obj => obj.name || "Objeto sem nome").join(", ");
-      namesELement.innerText = `Objetos possíveis selecionados: ${names}`;
-    } else {
-      namesELement.innerText = "nenhum Objeto selecionado.";
-    };
+    console.log(intersectedItems.map((x) => [x.object.name, x.object.type]));
+    const pickedItems = intersectedItems.filter(
+      (x) => x.object.type !== "GridHelper"
+    );
+    console.log("pickedItems", pickedItems);
+    displayObjectNames(pickedItems);
   };
-
-  /**
-   * TODO #5
-   * Shows object names in view, not using console.log.
-   * Tips:
-   *  - Use a simple <p> tag to show the text.
-   *  - HTMLElement.prototype.innerText
-   *  - Identify <p> tag with #id pick-objects-names
-   *  - document.querySelector('#pick-objects-names')
-   *  - Use Array.prototype.join(lambda) to convert a array into a string
-   */
-};
-
+}
 
 const pickHelper = new PickHelper();
 
@@ -178,52 +173,53 @@ function clearPickPosition() {
   pickPosition.y = -100000;
 }
 
-/**
- * TODO #4
- * Show an Toggle Button at UI that should define if you want to see
- * objects based on their click or by hovering them.
- * If Toggle is Active, use HOVER.
- * If Toggle is not Active, use CLICK.
- * Every time the Toggle changes, you should exchange event listeners.
- * Tips:
- *  - window.removeEventListener
- *  - create a toggle using a simple button in HTML
- *  - add event listener to the button which executes the toggle of events
- *
- * This should happen so the user can choose if it wants to see
- * objects names based on clicks or hovers.
- */
-
 const toggleButton = document.getElementById("toggleButton");
 
-let isClickEvent = true;
-
+let isClickEvent = false;
 
 toggleButton.addEventListener("click", () => {
-  toggleButton.classList.toggle("off");
-
-  if (toggleButton.classList.contains("off")) {
-    isClickEvent = !isClickEvent;
-    toggleButton.textContent = "Hover";
-  } else {
-    toggleButton.textContent = "Click";
-  };
+  console.log("Clicou no botão");
   toggleEvent();
 });
 
+function onDblClickEvent(event) {
+  console.log(`Event`, event);
+  setPickPosition(event);
+  pickHelper.pick(pickPosition, scene, camera);
+}
+
+function onHoverEvent(event) {
+  console.log(`Event`, event);
+  if (event.type === "mouseenter") {
+    setPickPosition(event);
+  } else {
+    clearPickPosition();
+  }
+  pickHelper.pick(pickPosition, scene, camera);
+}
 
 const toggleEvent = () => {
-  canvas.removeEventListener("dblclick", setPickPosition);
-  canvas.removeEventListener("mouseenter", setPickPosition);
-  canvas.removeEventListener("mouseleave", clearPickPosition);
+  /**
+   * TODO #03 Javascript Ternary
+   * What they are
+   * When to use
+   * When to not use
+   *  */
+  isClickEvent = !isClickEvent;
+  toggleButton.textContent = isClickEvent ? "Click" : "Hover";
+  toggleButton.classList.toggle("off");
 
+  console.log("Toggle Event");
+  canvas.removeEventListener("dblclick", onDblClickEvent);
+  canvas.removeEventListener("mouseenter", onHoverEvent);
+  canvas.removeEventListener("mouseleave", onHoverEvent);
 
   if (isClickEvent) {
-    canvas.addEventListener("dblclick", setPickPosition);
+    canvas.addEventListener("dblclick", onDblClickEvent);
     console.log("Modo Click ativado");
   } else {
-    canvas.addEventListener("mouseenter", setPickPosition);
-    canvas.addEventListener("mouseleave", clearPickPosition);
+    canvas.addEventListener("mouseenter", onHoverEvent);
+    canvas.addEventListener("mouseleave", onHoverEvent);
     console.log("Modo Hover ativado");
   }
 };
@@ -232,7 +228,6 @@ toggleEvent();
 
 function render() {
   checkResizeRendererToDisplaySize(renderer);
-  pickHelper.pick(pickPosition, scene, camera);
 
   renderer.render(scene, camera);
   requestAnimationFrame(render);

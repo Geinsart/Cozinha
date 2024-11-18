@@ -1,0 +1,60 @@
+import * as THREE from "three";
+import { canvas, pickPosition } from "./index.js";
+
+export function displayObjectNames(pickedItems) {
+    const namesELement = document.querySelector("#pick-objects-names");
+
+    if (pickedItems.length > 0) {
+        const names = pickedItems
+            .map((item) => {
+                const name = item.object.name || "Objeto sem nome";
+                const distance = item.distance;
+                return `${name} (${distance})`;
+            })
+            .join("\n");
+        namesELement.innerText = `Objetos possíveis selecionados:\n${names}`;
+    } else {
+        namesELement.innerText = "nenhum Objeto selecionado.";
+    }
+}
+
+export function PickHelper() {
+    const raycaster = new THREE.Raycaster();
+    const pickedObjects = [];
+
+    function pick(normalizedPosition, scene, camera) {
+        raycaster.setFromCamera(normalizedPosition, camera);
+        const intersectedItems = raycaster.intersectObjects(scene.children, true);
+
+        console.log(intersectedItems.map((x) => [x.object.name, x.object.type]));
+        const pickedItems = intersectedItems.filter(
+            (x) => x.object.type !== "GridHelper"
+        );
+        console.log("pickedItems", pickedItems);
+        displayObjectNames(pickedItems);
+    }
+    return { pick };
+}
+
+
+
+
+
+export function getCanvasRelativePosition(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: ((event.clientX - rect.left) * canvas.width) / rect.width,
+        y: ((event.clientY - rect.top) * canvas.height) / rect.height,
+    };
+}
+
+export function setPickPosition(event) {
+    const pos = getCanvasRelativePosition(event);
+    pickPosition.x = (pos.x / canvas.width) * 2 - 1;
+    pickPosition.y = (pos.y / canvas.height) * -2 + 1;
+}
+
+export function clearPickPosition() {
+    pickPosition.x = -100000;
+    pickPosition.y = -100000;
+};

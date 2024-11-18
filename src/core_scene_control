@@ -1,0 +1,28 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+export const cameraConfig = {
+    fov: 75,
+    aspect: 2, // the canvas default
+    near: 0.1,
+    far: 10,
+    position: { x: 1, y: 1, z: 2 },
+};
+
+export const axesConfig = {
+    axes: 3
+};
+
+export const gridConfig = {
+    size: 5,
+    divisions: 10,
+};
+
+export const lightConfig = {
+    color: 0xffffff,
+    intensity: 1,
+};
+
+
+
+

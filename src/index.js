@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { cameraConfig, gridHelperConfig, axesHelperConfig, ambientLightConfig } from "./core_scene_control.js"
 import { makeBoxInstance, makeBoxInstanceV2 } from "./makeInstance";
-import { cameraConfig, lightConfig, axesConfig, gridConfig } from "./core_scene_control"
 import { sceneObjects } from "./scene_objects";
-import { displayObjectNames, PickHelper, getCanvasRelativePosition, setPickPosition, clearPickPosition } from "./scene_helpers";
-import { isClickEvent, onDblClickEvent, onHoverEvent } from "./ui_display"
+import { displayObjectNames, PickHelper } from "./scene_helpers.js"
+
 
 /**
  * #TODO 01
@@ -17,7 +17,8 @@ import { isClickEvent, onDblClickEvent, onHoverEvent } from "./ui_display"
  * Next step (for next sessions): TypeScript
  */
 
-export const camera = new THREE.PerspectiveCamera(
+
+const camera = new THREE.PerspectiveCamera(
   cameraConfig.fov,
   cameraConfig.aspect,
   cameraConfig.near,
@@ -29,21 +30,19 @@ camera.position.set(
   cameraConfig.position.z);
 
 
-const light = new THREE.AmbientLight(
-  lightConfig.color,
-  lightConfig.intensity
-);
-const gridHelper = new THREE.GridHelper(gridConfig);
-const axesHelper = new THREE.AxesHelper(axesConfig)
+const gridHelper = new THREE.GridHelper(gridHelperConfig.divisions, gridHelperConfig.size);
+const axesHelper = new THREE.AxesHelper(axesHelperConfig);
+const light = new THREE.AmbientLight(ambientLightConfig.color, ambientLightConfig.intensity);
 
-export const scene = new THREE.Scene();
+const scene = new THREE.Scene();
 scene.add(gridHelper);
 scene.add(axesHelper);
 scene.add(light);
 
-export const canvas = document.querySelector("#c");
+const canvas = document.querySelector("#c");
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 const controls = new OrbitControls(camera, renderer.domElement);
+
 document.body.appendChild(renderer.domElement);
 
 sceneObjects.forEach((obj) => scene.add(obj.object.cube));
@@ -60,28 +59,56 @@ sceneObjects.forEach((obj) => scene.add(obj.object.cube));
  *  - document.querySelector('#pick-objects-names')
  *  - Use Array.prototype.join(lambda) to convert a array into a string
  */
-PickHelper();
 
-export const pickHelper = new PickHelper();
+const pickHelper = new PickHelper();
 
-export const pickPosition = { x: 0, y: 0 };
+const pickPosition = { x: 0, y: 0 };
 
 clearPickPosition();
 
-getCanvasRelativePosition(event);
-setPickPosition(event);
-clearPickPosition();
+function getCanvasRelativePosition(event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) * canvas.width) / rect.width,
+    y: ((event.clientY - rect.top) * canvas.height) / rect.height,
+  };
+}
 
+function setPickPosition(event) {
+  const pos = getCanvasRelativePosition(event);
+  pickPosition.x = (pos.x / canvas.width) * 2 - 1;
+  pickPosition.y = (pos.y / canvas.height) * -2 + 1;
+}
 
-
+function clearPickPosition() {
+  pickPosition.x = -100000;
+  pickPosition.y = -100000;
+}
 
 const toggleButton = document.getElementById("toggleButton");
+
+let isClickEvent = false;
 
 toggleButton.addEventListener("click", () => {
   console.log("Clicou no botão");
   toggleEvent();
 });
 
+function onDblClickEvent(event) {
+  console.log(`Event`, event);
+  setPickPosition(event);
+  pickHelper.pick(pickPosition, scene, camera);
+}
+
+function onHoverEvent(event) {
+  console.log(`Event`, event);
+  if (event.type === "mouseenter") {
+    setPickPosition(event);
+  } else {
+    clearPickPosition();
+  }
+  pickHelper.pick(pickPosition, scene, camera);
+}
 
 const toggleEvent = () => {
   /**
@@ -133,6 +160,8 @@ function checkResizeRendererToDisplaySize(renderer) {
   return needResize;
 }
 
+
+
 requestAnimationFrame(render);
 
 // Adiciona um listener para redimensionamento
@@ -143,3 +172,4 @@ window.addEventListener(
   },
   false
 );
+

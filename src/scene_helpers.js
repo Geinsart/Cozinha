@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { canvas, pickPosition } from "./index.js";
+import { sceneObjects } from "./scene_objects"
+
 
 export function displayObjectNames(pickedItems) {
     const namesELement = document.querySelector("#pick-objects-names");
@@ -16,13 +17,13 @@ export function displayObjectNames(pickedItems) {
     } else {
         namesELement.innerText = "nenhum Objeto selecionado.";
     }
-}
+};
 
 export function PickHelper() {
     const raycaster = new THREE.Raycaster();
-    const pickedObjects = [];
+    let pickedObjects = [];
 
-    function pick(normalizedPosition, scene, camera) {
+    this.pick = (normalizedPosition, scene, camera) => {
         raycaster.setFromCamera(normalizedPosition, camera);
         const intersectedItems = raycaster.intersectObjects(scene.children, true);
 
@@ -32,29 +33,5 @@ export function PickHelper() {
         );
         console.log("pickedItems", pickedItems);
         displayObjectNames(pickedItems);
-    }
-    return { pick };
-}
-
-
-
-
-
-export function getCanvasRelativePosition(event) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: ((event.clientX - rect.left) * canvas.width) / rect.width,
-        y: ((event.clientY - rect.top) * canvas.height) / rect.height,
     };
 }
-
-export function setPickPosition(event) {
-    const pos = getCanvasRelativePosition(event);
-    pickPosition.x = (pos.x / canvas.width) * 2 - 1;
-    pickPosition.y = (pos.y / canvas.height) * -2 + 1;
-}
-
-export function clearPickPosition() {
-    pickPosition.x = -100000;
-    pickPosition.y = -100000;
-};

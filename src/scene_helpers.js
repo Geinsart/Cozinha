@@ -5,15 +5,20 @@ import { sceneObjects } from "./scene_objects"
 export function displayObjectNames(pickedItems) {
     const namesELement = document.querySelector("#pick-objects-names");
 
+    namesELement.innerHTML = "";
+
     if (pickedItems.length > 0) {
         const names = pickedItems
             .map((item) => {
                 const name = item.object.name || "Objeto sem nome";
-                const distance = item.distance;
-                return `${name} (${distance})`;
-            })
-            .join("\n");
-        namesELement.innerText = `Objetos possíveis selecionados:\n${names}`;
+                const distance = item.distance.toFixed(1);
+
+                const p = document.createElement("p");
+                p.innerText = `${name} (${distance})`;
+                namesELement.appendChild(p);
+            });
+
+
     } else {
         namesELement.innerText = "nenhum Objeto selecionado.";
     }

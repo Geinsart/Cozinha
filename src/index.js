@@ -30,13 +30,13 @@ camera.position.set(
   cameraConfig.position.z);
 
 
-const gridHelper = new THREE.GridHelper(gridHelperConfig.divisions, gridHelperConfig.size);
+export const gridHelper = new THREE.GridHelper(gridHelperConfig.divisions, gridHelperConfig.size);
 const axesHelper = new THREE.AxesHelper(axesHelperConfig);
 const light = new THREE.AmbientLight(ambientLightConfig.color, ambientLightConfig.intensity);
 
 const scene = new THREE.Scene();
 scene.add(gridHelper);
-scene.add(axesHelper);
+//scene.add(axesHelper);
 scene.add(light);
 
 const canvas = document.querySelector("#c");

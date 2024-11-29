@@ -3,7 +3,7 @@ import { sceneObjects } from "./scene_objects";
 import { displayObjectNames } from "./ui_display";
 import { loadScene } from "./core_scene_control.js";
 
-const { scene, camera } = loadScene(); //import solicitado na última semana
+const { scene, camera } = loadScene();
 
 const default_pickPosition = { x: 0, y: 0 };
 

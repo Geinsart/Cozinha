@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { makeBoxInstance, makeBoxInstanceV2 } from "./makeInstance";
+import { makeBoxInstanceV2 } from "./makeInstance";
 
 export const sceneObjects = [
     {

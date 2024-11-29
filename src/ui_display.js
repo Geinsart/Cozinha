@@ -28,12 +28,7 @@ const toggleButton = document.getElementById("toggleButton");
 let isClickEvent = false;
 
 export const toggleEvents = (canvas, pickHelper) => {
-  /**
-   * TODO #03 Javascript Ternary
-   * What they are
-   * When to use
-   * When to not use
-   *  */
+
   isClickEvent = !isClickEvent;
   toggleButton.textContent = isClickEvent ? "Click" : "Hover";
   toggleButton.classList.toggle("off");

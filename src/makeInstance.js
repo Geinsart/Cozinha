@@ -1,15 +1,6 @@
 import * as THREE from "three";
 
-export function makeBoxInstance(
-  color,
-  position,
-  rotation,
-  size,
-  side = THREE.FrontSide
-) {
-  const args = { color, position, rotation, size, side: side };
-  return makeBoxInstanceV2(args);
-}
+
 
 export function makeBoxInstanceV2(args) {
   const { color, position, rotation, size, side = THREE.FrontSide } = args;

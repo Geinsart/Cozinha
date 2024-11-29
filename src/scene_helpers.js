@@ -57,6 +57,6 @@ export function PickOnDblClickEvent(pickHelper, event) {
 }
 
 export function PickOnHoverEvent(pickHelper, event) {
-  // import scene, camera
+
   pickHelper.pickEvent(event, scene, camera);
 }

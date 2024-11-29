@@ -3,7 +3,6 @@ import { makeBoxInstanceV2 } from "./makeInstance";
 
 export const sceneObjects = [
     {
-        name: "freezer",
         object: makeBoxInstanceV2({
             name: "freezer",
             color: 0x0000ff,
@@ -14,7 +13,6 @@ export const sceneObjects = [
     },
 
     {
-        name: "walls",
         object: makeBoxInstanceV2({
             name: "walls",
             color: 0xffa500,
@@ -26,7 +24,6 @@ export const sceneObjects = [
     },
 
     {
-        name: "sink",
         object: makeBoxInstanceV2({
             name: "sink",
             color: 0x800080,
@@ -37,7 +34,6 @@ export const sceneObjects = [
     },
 
     {
-        name: "chinaCabinet",
         object: makeBoxInstanceV2({
             name: "chinaCabinet",
             color: 0x800080,
@@ -47,13 +43,23 @@ export const sceneObjects = [
         }),
     },
     {
-        name: "cooktop",
+
         object: makeBoxInstanceV2({
             name: "cooktop",
             color: 0x00ff00,
             position: { x: 0, y: 0.5, z: -2 },
             rotation: { x: 0, y: 0, z: 0 },
             size: { x: 1, y: 1, z: 1 },
+        }),
+    },
+
+    {
+        object: makeBoxInstanceV2({
+            name: "light",
+            color: 0x00ff00,
+            position: { x: 1, y: 2.2, z: 0 },
+            rotation: { x: 0, y: 0, z: 0 },
+            size: { x: 0.5, y: 0.5, z: 0.5 },
         }),
     },
 ];

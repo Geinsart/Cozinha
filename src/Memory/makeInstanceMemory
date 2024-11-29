@@ -1,0 +1,10 @@
+export function makeBoxInstance(
+    color,
+    position,
+    rotation,
+    size,
+    side = THREE.FrontSide
+) {
+    const args = { color, position, rotation, size, side: side };
+    return makeBoxInstanceV2(args);
+}

@@ -1,12 +1,7 @@
 import { isClickEvent, toggleButton, canvas, onDblClickEvent, onHoverEvent } from ".";
 
 export const toggleEvent = () => {
-    /**
-     * TODO #03 Javascript Ternary
-     * What they are
-     * When to use
-     * When to not use
-     *  */
+
     isClickEvent = !isClickEvent;
     toggleButton.textContent = isClickEvent ? "Click" : "Hover";
     toggleButton.classList.toggle("off");

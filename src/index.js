@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { loadScene, getRenderCore } from "./core_scene_control.js";
 import { sceneObjects } from "./scene_objects";
 import { loadButtonEvents } from "./ui_display.js";
@@ -12,12 +13,3 @@ sceneObjects.forEach((obj) => scene.add(obj.object.cube));
 
 loadButtonEvents(canvas);
 requestAnimationFrame(render);
-
-// Adiciona um listener para redimensionamento
-window.addEventListener(
-  "resize",
-  () => {
-    checkResizeRendererToDisplaySize(renderer);
-  },
-  false
-);

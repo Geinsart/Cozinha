@@ -1,0 +1,7 @@
+window.addEventListener(
+    "resize",
+    () => {
+        checkResizeRendererToDisplaySize(renderer);
+    },
+    false
+);

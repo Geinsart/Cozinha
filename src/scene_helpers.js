@@ -37,6 +37,7 @@ export function PickHelper(canvas, pickPosition = default_pickPosition) {
     console.log(intersectedItems.map((x) => [x.object.name, x.object.type]));
     const pickedItems = intersectedItems.filter(
       (x) => x.object.type !== "GridHelper" && x.object.name !== "walls"
+        && x.object.name !== "chinaCabinet"
 
     );
     console.log("pickedItems", pickedItems);

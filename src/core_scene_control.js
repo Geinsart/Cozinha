@@ -71,10 +71,9 @@ export function loadScene(position = cameraConfig.position) {
 export function getRenderCore(canvas, camera, scene) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 
-  // TODO: Why do document.body.appendChild is required if Canvas is already defined in HTML?
   document.body.appendChild(renderer.domElement);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  //const controls = new OrbitControls(camera, renderer.domElement);
 
   function checkResizeRendererToDisplaySize(renderer) {
     const width = canvas.clientWidth;
@@ -92,7 +91,7 @@ export function getRenderCore(canvas, camera, scene) {
     checkResizeRendererToDisplaySize(renderer);
     renderer.render(scene, camera);
     requestAnimationFrame(render);
-    controls.update();
+    //controls.update();
   }
 
   const core = {

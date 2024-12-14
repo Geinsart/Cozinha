@@ -1,11 +1,15 @@
-const url = 'https://api.thecatapi.com/v1/images/search?limit=10'
+const url = "http://www.randomnumberapi.com/api/v1.0/randomnumber";
 
 async function getApi() {
     const response = await fetch(url);
-    if (response.status === 200) {
-        const data = await response.json();
-        console.log(data);
+    const data = await response.json();
+    const number = data[0];
+
+    return {
+        number,
     }
 }
 
-chamarApi();
+getApi();
+
+console.log(number + 5)

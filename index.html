@@ -13,6 +13,11 @@
             overflow-x: hidden;
         }
 
+        .confirmarGasto {
+            background-color: green;
+            color: white;
+        }
+
         /* Evita rolagem, garantindo que o canvas ocupe toda a tela */
         #c {
             width: 100vw;
@@ -36,21 +41,20 @@
             /* Cor para o estado desativado */
         }
 
-        .toggle-btn2 {
+        /*  .toggle-btn2 {
             padding: 10px 50px;
             font-size: 16px;
             cursor: pointer;
             background-color: #4CAF50;
             /* Cor inicial (ativado) */
-            color: white;
+        /* color: white;
             border: none;
             border-radius: 5px;
         }
 
-        .off {
+        .ofcomo f {
             background-color: #f44336;
-            /* Cor para o estado desativado */
-        }
+            /* Cor para o estado desativado }*/
     </style>
 </head>
 
@@ -58,18 +62,26 @@
     <canvas id="c"></canvas>
     <section style="margin-left: 10px;">
         <h1 id="pick-objects-names" style="margin: 0;">Nenhum Objeto selecionado.</h1>
-        <button id="LigarObjeto" class="toggle-btn2">ligar o objeto</button>
+        <div>
+            <br>
+
+            <input type="checkbox" id="ligar" name="LigarObjeto" value="light" />
+            <label for="ligar">light</label>
+        </div>
         <br>
 
         <div>
-            <button style="display: inline-block; margin-left: 10px;">Tempo ligado</button>
-            <p>tempo de uso é</p>
+            <button id="tempoLigado" style="display: inline-block; margin-left: 10px;">Tempo ligado</button>
+            <label for="tempoLigado">tempo de uso é:</label>
         </div>
+        <br>
         <div>
-            <button>Gasto estimado:</button>
-            <p style="display: flex; align-items: center;">O gasto estimado é:</p>
+            <button id="gastoEstimado">Gasto estimado:</button>
+            <label for="gastoEstimado">O gasto estimado é:</label>
+            <br>
             <div>
-                <button>Confirmar gasto</button>
+                <br>
+                <button id="confirmarGasto" class="confirmarGasto">Confirmar gasto</button>
             </div>
         </div>
 

@@ -6,6 +6,8 @@ import {
 
 export function displayObjectNames(pickedItems) {
   const namesELement = document.querySelector("#pick-objects-names");
+  const turnOnButton = document.getElementById("ligar");
+  //const labelTurnOnButton = document.getElementById("labelLigar");
 
   namesELement.innerHTML = "";
 
@@ -13,6 +15,7 @@ export function displayObjectNames(pickedItems) {
     const names = pickedItems.map((item) => {
       const name = item.object.name || "Objeto sem nome";
       const distance = item.distance.toFixed(1);
+      turnOnButton.style.display = 'block';
 
       const p = document.createElement("p");
       p.innerText = `${name} (${distance})`;
@@ -20,6 +23,7 @@ export function displayObjectNames(pickedItems) {
     });
   } else {
     namesELement.innerText = "nenhum Objeto selecionado.";
+    turnOnButton.style.display = 'none';
   }
 }
 

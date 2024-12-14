@@ -45,6 +45,7 @@ export function PickHelper(canvas, pickPosition = default_pickPosition) {
   }
 
 
+
   return {
     pickPosition,
     pickEvent,

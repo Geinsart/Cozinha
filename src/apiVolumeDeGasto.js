@@ -3,7 +3,7 @@ const url = "http://www.randomnumberapi.com/api/v1.0/randomnumber";
 async function getApi() {
     const response = await fetch(url);
     const data = await response.json();
-    const number = data[0];
+    const number = await data[0];
 
     return {
         number,
@@ -13,3 +13,5 @@ async function getApi() {
 getApi();
 
 console.log(number + 5)
+
+
